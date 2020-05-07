@@ -7,6 +7,7 @@ const path = require('path');
 mongoose.Promise = global.Promise;
 require('./Models/Score');
 require('./Models/User');
+require('./Models/ClickHistory');
 mongoose.connect(
   'mongodb://localhost:27017/YoyoClicker-Dev',
   { useNewUrlParser: true },

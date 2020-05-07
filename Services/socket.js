@@ -3,7 +3,8 @@ const socketIoAuth = require('socketio-auth');
 const mongoose = require('mongoose');
 
 const userModel = mongoose.model('User');
-const scoreMode = mongoose.model('Score');
+const scoreModel = mongoose.model('Score');
+const clickHistoryModel = mongoose.model('ClickHistory');
 
 module.exports = (server) => {
   const io = socketIo(server);
@@ -45,12 +46,15 @@ module.exports = (server) => {
         //authenticate
         const { email, code } = data;
         const user = await userModel.findOne({ email });
-        if (user.code == code) {
-          const { _id, img, name } = user;
-          const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
-          clickerList.push(newClicker);
-          socket.broadcast.emit('newClicker', newClicker);
-          callback(null, { id: user._id, clickerList });
+        //if (user.code == code) {
+        if (user) {
+          const { _id, img, name, isAdmin } = user;
+          if (!isAdmin) {
+            const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
+            clickerList.push(newClicker);
+            socket.broadcast.emit('newClicker', newClicker);
+          }
+          callback(null, { id: user._id, isAdmin, clickerList });
         } else {
           callback(new Error('Código ou email invalido'));
         }
@@ -76,23 +80,54 @@ module.exports = (server) => {
       socket.broadcast.emit('clicked', data);
     });
 
-    socket.on('videoEnded', (data) => {
+    socket.on('save', async (data) => {
+      console.log(data);
+      const score = new scoreModel(data);
+      console.log(score);
+      await score.save();
+      socket.emit('saved');
+    });
+
+    socket.on('videoEnded', async (data) => {
       //save summary of clicks
       //save as user ended
       //when ever user ended give ok for admin change video
+      const clickHistory = new clickHistoryModel(data);
+      await clickHistory.save();
+      socket.emit('clickHistorySaved');
     });
 
     //Admin controls
     socket.on('videoChange', (data) => {
-      //check if admin
-      //check if video can change
+      console.log('videoChange');
+      //todo:check if admin
+      //todo:check if video can change
       //broadcast video change
+      socket.broadcast.emit('videoChange', data);
     });
 
     socket.on('videoStart', () => {
-      //check admin
-      //chack if can start
+      console.log('videoStart');
+      //todo:check admin
+      //todo:chack if can start
       //broadcast
+      socket.broadcast.emit('videoStart');
+    });
+
+    socket.on('videoPause', () => {
+      console.log('videoPause');
+      //todo:check admin
+      //todo:chack if can start
+      //broadcast
+      socket.broadcast.emit('videoPause');
+    });
+
+    socket.on('videoRestart', () => {
+      console.log('videoRestart');
+      //todo:check admin
+      //todo:chack if can start
+      //broadcast
+      socket.broadcast.emit('videoRestart');
     });
 
     socket.on('forceFinishVideo', () => {
