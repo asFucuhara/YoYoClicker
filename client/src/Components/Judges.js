@@ -8,18 +8,18 @@ class Judges extends React.Component {
           {this.props.clickers.list.map((id) => {
             const { name, negative, positive, img } = this.props.clickers[id];
             return (
-              <div className="clickerUnit">
-                <img src={img} />
+              <div className="clickerUnit" key={id} id={id}>
+                <img src={img} alt="" />
                 <div className="text">
                   <div className="name">{name}</div>
                   <div className="score">
                     <div>
-                      <spam className="negative">- </spam>
-                      <spam id="negativeNumber">{negative}</spam>
+                      <span className="negative">- </span>
+                      <span id="negativeNumber">{negative}</span>
                     </div>
                     <div>
-                      <spam className="positive">+ </spam>
-                      <spam id="positiveNumber">{positive}</spam>
+                      <span className="positive">+ </span>
+                      <span id="positiveNumber">{positive}</span>
                     </div>
                   </div>
                 </div>

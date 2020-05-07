@@ -7,6 +7,7 @@ class LoginCard extends React.Component {
     signUpEmail: '',
     singUpName: '',
   };
+
   render() {
     return (
       <div className="loginComponent">
@@ -18,12 +19,12 @@ class LoginCard extends React.Component {
               value={this.state.loginEmail}
               onChange={(e) => this.setState({ loginEmail: e.target.value })}
             />
-            <p>Código:</p>
+            {/* <p>Código:</p>
             <input
               type="password"
               value={this.state.loginCode}
               onChange={(e) => this.setState({ loginCode: e.target.value })}
-            />
+            /> */}
             <br />
             <button
               onClick={() => {
