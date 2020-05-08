@@ -10,7 +10,7 @@ module.exports = (server) => {
   const io = socketIo(server);
 
   const clickerList = [];
-  const isPlaying = false;
+  let isPlaying = false;
 
   //socket authentication
   socketIoAuth(io, {
