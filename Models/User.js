@@ -7,6 +7,7 @@ const userSchema = new Schema({
   img: String,
   code: Number,
   isAdmin: Boolean,
+  isJudge: Boolean,
 });
 
 mongoose.model('User', userSchema);

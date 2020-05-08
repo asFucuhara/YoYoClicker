@@ -1,19 +1,26 @@
 import React from 'react';
 
 class AdminPanel extends React.Component {
+  state = {
+    next: '',
+  };
   render() {
     return (
       <div className="adminPanel">
         <div>
           next video:
-          <input type="text" />
+          <input
+            type="text"
+            value={this.state.next}
+            onChange={(event) => this.setState({ next: event.target.value })}
+          />
         </div>
         <div>
           display next video info!
           <button
             onClick={() =>
               this.props.socket.emit('videoChange', {
-                videoId: 'KDMMjKEGckc',
+                videoId: this.state.next,
               })
             }
           >
