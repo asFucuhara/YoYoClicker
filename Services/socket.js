@@ -10,10 +10,12 @@ module.exports = (server) => {
   const io = socketIo(server);
 
   const clickerList = [];
+  const isPlaying = false;
 
   //socket authentication
   socketIoAuth(io, {
     authenticate: async (socket, data, callback) => {
+      //todo if playing display to user and make it wait for next video
       const { isNew } = data;
       if (isNew) {
         //create user
@@ -30,6 +32,7 @@ module.exports = (server) => {
             //todo check if newUser has id
             const { _id, img, name } = newUser;
             const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
+            socket.clientId = _id;
             clickerList.push(newClicker);
             socket.broadcast.emit('newClicker', newClicker);
             callback(null, { id: newUser._id, clickerList, code });
@@ -51,6 +54,7 @@ module.exports = (server) => {
           const { _id, img, name, isAdmin } = user;
           if (!isAdmin) {
             const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
+            socket.clientId = _id;
             clickerList.push(newClicker);
             socket.broadcast.emit('newClicker', newClicker);
           }
@@ -86,12 +90,17 @@ module.exports = (server) => {
       console.log(score);
       await score.save();
       socket.emit('saved');
+      socket.broadcast.emit('syncClick', {
+        id: socket.clientId,
+        positive: 0,
+        negative: 0,
+      });
     });
 
     socket.on('videoEnded', async (data) => {
       //save summary of clicks
       //save as user ended
-      //when ever user ended give ok for admin change video
+      //todo when ever user ended give ok for admin change video
       const clickHistory = new clickHistoryModel(data);
       await clickHistory.save();
       socket.emit('clickHistorySaved');
@@ -102,6 +111,8 @@ module.exports = (server) => {
       console.log('videoChange');
       //todo:check if admin
       //todo:check if video can change
+      //change state to paused
+      isPlaying = false;
       //broadcast video change
       socket.broadcast.emit('videoChange', data);
     });
@@ -110,6 +121,8 @@ module.exports = (server) => {
       console.log('videoStart');
       //todo:check admin
       //todo:chack if can start
+      //change state to playing
+      isPlaying = true;
       //broadcast
       socket.broadcast.emit('videoStart');
     });
@@ -126,6 +139,8 @@ module.exports = (server) => {
       console.log('videoRestart');
       //todo:check admin
       //todo:chack if can start
+      //change state to playing
+      isPlaying = true;
       //broadcast
       socket.broadcast.emit('videoRestart');
     });

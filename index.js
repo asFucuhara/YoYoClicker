@@ -9,7 +9,7 @@ require('./Models/Score');
 require('./Models/User');
 require('./Models/ClickHistory');
 mongoose.connect(
-  'mongodb://localhost:27017/YoyoClicker-Dev',
+  process.env.MONGOURL || 'mongodb://localhost:27017/YoyoClicker-Dev',
   { useNewUrlParser: true },
   () => console.log('Db Connected')
 );

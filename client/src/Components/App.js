@@ -81,7 +81,7 @@ class App extends React.Component {
         newClickerList[id].negative += 1;
       }
 
-      this.setState(newClickerList);
+      this.setState({ clickers: newClickerList });
     },
     saved: () => {
       this.setState({
@@ -99,8 +99,12 @@ class App extends React.Component {
       console.log('clickHistorySaved');
     },
     syncClick: (data) => {
-      //data = {id, sync=true, positivo, negativo}; ||
-      //implement if generating a lot of errors
+      //data = {id, positivo, negativo};
+      const { id, positive, negative } = data;
+      const newClickerList = { ...this.state.clickers };
+      newClickerList[id].positive = positive;
+      newClickerList[id].negative = negative;
+      this.setState({ clickers: newClickerList });
     },
     videoChange: (data) => {
       //data = url
