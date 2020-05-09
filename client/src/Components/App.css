@@ -1,13 +1,16 @@
 body {
   margin: 0;
   color: #989898;
-  background-image: url('https://scontent.fcgh7-1.fna.fbcdn.net/v/t1.0-9/36284660_831027587093954_5660451151607234560_n.jpg?_nc_cat=111&_nc_sid=ca434c&_nc_eui2=AeGS2pZTUZRC76aB5Wwa1j9AUWpKWh2O6PtRakpaHY7o-xGSaCxtVHQGFP3RAo27pyQ&_nc_ohc=OI8W6lSDYPUAX9cQtZ0&_nc_ht=scontent.fcgh7-1.fna&oh=981e84d17e7501f768f969c31f89fa55&oe=5EDD31BD');
+  background-image: linear-gradient(
+      rgba(97, 97, 97, 0.5),
+      rgba(97, 97, 97, 0.5)
+    ),
+    url('https://scontent.fcgh7-1.fna.fbcdn.net/v/t1.0-9/36284660_831027587093954_5660451151607234560_n.jpg?_nc_cat=111&_nc_sid=ca434c&_nc_eui2=AeGS2pZTUZRC76aB5Wwa1j9AUWpKWh2O6PtRakpaHY7o-xGSaCxtVHQGFP3RAo27pyQ&_nc_ohc=OI8W6lSDYPUAX9cQtZ0&_nc_ht=scontent.fcgh7-1.fna&oh=981e84d17e7501f768f969c31f89fa55&oe=5EDD31BD');
   height: 100vh; /* You must set a specified height */
   background-position: center; /* Center the image */
   background-repeat: no-repeat; /* Do not repeat the image */
   background-size: cover; /* Resize the background image to cover the entire container */
   width: 100vw;
-  
 }
 
 .blocker {
@@ -27,7 +30,6 @@ body {
 }
 
 .App {
-  background-color: rgba(97, 97, 97, 0.5);
   height: 100vh;
   width: 100vw;
   display: grid;
