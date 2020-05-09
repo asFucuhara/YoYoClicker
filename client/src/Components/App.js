@@ -238,6 +238,7 @@ class App extends React.Component {
       this.YTalredyMounted = true;
       this.player = new window.YT.Player(`player`, {
         videoId: this.videoId,
+        playerVars: { disablekb: 1 , fs: 0, iv_load_policy: 3, modestbranding: 1,},
         events: this.videoEvents,
       });
     }
