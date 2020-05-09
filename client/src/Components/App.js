@@ -116,6 +116,18 @@ class App extends React.Component {
       //data = url
       this.videoId = data.videoId;
       this.player.cueVideoById(data.videoId);
+      this.save({ clicks: this.state.score });
+      //restart variables
+      this.setState({
+        positive: 0,
+        negative: 0,
+        score: 0,
+        showAvaliationPanel: false,
+        isBlocked: true,
+      });
+      this.clickHistory = [];
+      this.timeManager.restart();
+
       console.log('messsage received' + data.url);
     },
     videoStart: (data) => {
@@ -238,7 +250,12 @@ class App extends React.Component {
       this.YTalredyMounted = true;
       this.player = new window.YT.Player(`player`, {
         videoId: this.videoId,
-        playerVars: { disablekb: 1 , fs: 0, iv_load_policy: 3, modestbranding: 1,},
+        playerVars: {
+          disablekb: 1,
+          fs: 0,
+          iv_load_policy: 3,
+          modestbranding: 1,
+        },
         events: this.videoEvents,
       });
     }
