@@ -9,7 +9,8 @@ const clickHistoryModel = mongoose.model('ClickHistory');
 module.exports = (server) => {
   const io = socketIo(server);
 
-  const clickerList = [];
+  //todo clickerList = {id:{ id: _id, img, name, positive: 0, negative: 0 }, list:[ids...]}
+  let clickerList = [];
   let isPlaying = false;
 
   //socket authentication
@@ -29,7 +30,6 @@ module.exports = (server) => {
           const newUser = new userModel({ email, name, code });
           try {
             await newUser.save();
-            //todo check if newUser has id
             const { _id, img, name } = newUser;
             const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
             socket.clientId = _id;
@@ -75,6 +75,12 @@ module.exports = (server) => {
     console.log('New client connected');
 
     socket.on('disconnect', () => {
+      //todo clickerList = [{id: _id, img, name, positive: 0, negative: 0 }]
+      //todo doing
+      clickerList = clickerList.filter(
+        (clickerObject) => socket.clientId !== clickerObject.id
+      );
+      socket.broadcast.emit('removeClicker', { id: socket.clientId });
       console.log('Client disconnected');
     });
 
