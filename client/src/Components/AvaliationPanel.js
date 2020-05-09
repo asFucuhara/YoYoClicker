@@ -27,7 +27,6 @@ class AvaliationPanel extends React.Component {
 
     //testing clicks
     fields.forEach((field) => {
-      console.log(this);
       const aux = this.state[field];
       const auxParsed = parseInt(aux);
       if (field === 'clicks') {

@@ -69,6 +69,12 @@ class App extends React.Component {
     newClicker: (data) => {
       this.addClicker(data);
     },
+    removeClicker: (data) => {
+      const newClickers = { ...this.state.clickers };
+      newClickers.list = newClickers.list.filter((id) => id !== data.id);
+      newClickers[data.id] = {};
+      this.setState({ clickers: newClickers });
+    },
     clicked: (data) => {
       //data = {id, click: true} //true positive/ false negative
       const { id, click } = data;
@@ -153,6 +159,7 @@ class App extends React.Component {
   //timer is paused
   isPaused = true;
 
+  /****Obsolete, use  */
   timeManager = {
     restart: () => {
       this.timer = 0;
@@ -281,7 +288,7 @@ class App extends React.Component {
 
     const { positive, negative } = this.state;
     this.clickHistory.push({
-      time: this.timeManager.get(),
+      time: Math.floor(this.player.getCurrentTime() * 1000),
       type: isPositive,
     });
     if (isPositive) {
