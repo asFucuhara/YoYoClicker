@@ -11,7 +11,7 @@ require('./Models/ClickHistory');
 mongoose.connect(
   process.env.MONGOURL || 'mongodb://localhost:27017/YoyoClicker-Dev',
   { useNewUrlParser: true },
-  () => console.log('Db Connected')
+  (error) => error ? console.error('Db:', error) : console.log('Db Connected')
 );
 
 const app = express();
