@@ -1,0 +1,27 @@
+### Room Index
+GET http://localhost:3333/room
+
+### Room Show
+GET http://localhost:3333/room/5f4d8ea91bc4748cfa736819
+
+
+### Room Create
+POST http://localhost:3333/room HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "testeSucesso",
+  "desc": "nois",
+  "owner": "5eb58f0b59fb1e0017123222"
+}
+
+### Room update
+PUT http://localhost:3333/room/5f4d8ea91bc4748cfa736819 HTTP/1.1
+Content-Type: application/json
+
+{
+  "desc": "69"
+}
+
+### Room Delete
+DELETE  http://localhost:3333/room/5f4d8ea91bc4748cfa736819
