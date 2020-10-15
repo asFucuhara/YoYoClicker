@@ -14,7 +14,7 @@ export const session = {
 
 export const socketAuthenticate = (params = {}) => {
   //connect socket
-  const socket = socketIOClient('./');
+  const socket = socketIOClient('/');
 
   return new Promise((resolve, reject) => {
     socket.on('connect', () => {
