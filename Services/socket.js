@@ -120,7 +120,7 @@ module.exports = (server) => {
       //change state to paused
       isPlaying = false;
       //broadcast video change
-      socket.broadcast.emit('videoChange', data);
+      socket.emit('videoChange', data);
     });
 
     socket.on('videoStart', () => {
@@ -130,7 +130,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      socket.broadcast.emit('videoStart');
+      socket.emit('videoStart');
     });
 
     socket.on('videoPause', () => {
@@ -138,7 +138,7 @@ module.exports = (server) => {
       //todo:check admin
       //todo:chack if can start
       //broadcast
-      socket.broadcast.emit('videoPause');
+      socket.emit('videoPause');
     });
 
     socket.on('videoRestart', () => {
@@ -148,7 +148,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      socket.broadcast.emit('videoRestart');
+      socket.emit('videoRestart');
     });
 
     socket.on('forceFinishVideo', () => {

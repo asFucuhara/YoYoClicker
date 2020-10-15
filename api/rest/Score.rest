@@ -1,0 +1,29 @@
+### Score Index
+GET http://localhost:3333/score
+
+### Score Show
+GET http://localhost:3333/score/5f3f1ceb644dec0017dca1b0
+
+
+### Score Create
+POST http://localhost:3333/score HTTP/1.1
+Content-Type: application/json
+
+{
+  "videoId": "1RdoOFLzeWg",
+  "clicker": "5eeaa82882761400173a8b59",
+  "clicks": 69,
+  "room": "5f46bbe170b8c5480b34b254",
+  "evaluation": [132,123,12]
+}
+
+### Score update
+PUT http://localhost:3333/score/5f3f1ceb644dec0017dca1b0 HTTP/1.1
+Content-Type: application/json
+
+{
+  "clicks": 69
+}
+
+### Score Delete
+DELETE  http://localhost:3333/score/5f4bf8b4c48e1f645cb260fb

@@ -1,5 +1,6 @@
 import React from 'react';
 import KeyboardEventHandler from 'react-keyboard-event-handler';
+//todo eventualy create types to react-keyboard-event-handler
 
 class Control extends React.Component {
   keySpec = {

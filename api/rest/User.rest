@@ -1,0 +1,27 @@
+### User Index
+GET http://localhost:3333/user
+
+### User Show
+GET http://localhost:3333/user/5f4d8e0d1bc4748cfa736818
+
+
+### User Create
+POST http://localhost:3333/user HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Teste1",
+    "email": "teste1@1",
+    "img": "https://avatars2.githubusercontent.com/u/9744859?s=460&u=37e0a0f996bf1cc835794bce3aeaf74c7070adf3&v=4"
+}
+
+### User update
+PUT http://localhost:3333/user/5f4d8e0d1bc4748cfa736818 HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "1234"
+}
+
+### User Delete
+DELETE  http://localhost:3333/user/5f4d8e0d1bc4748cfa736818
