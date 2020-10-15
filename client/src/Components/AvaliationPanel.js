@@ -13,6 +13,10 @@ class AvaliationPanel extends React.Component {
     execucao: '',
   };
 
+  // coreografia: Musicalidade Performance
+  // diversidade: Originalidade
+  // controle: Controle
+  // execucao: CarismaPresença
   save = () => {
     const fields = [
       'clicks',
@@ -33,9 +37,11 @@ class AvaliationPanel extends React.Component {
         if (isNaN(auxParsed)) {
           message = `${message} | Clicks deve ser um numero`;
         }
+      } else if (field === 'execucao') {
       } else {
         if (aux === '') {
           empty.push(field);
+          message = `${message} | ${field} está vazio`;
         } else if (isNaN(auxParsed)) {
           message = `${message} | ${field} numero invalido`;
         } else if (aux < 0 || aux > 10) {
@@ -44,7 +50,7 @@ class AvaliationPanel extends React.Component {
       }
     });
     //clicks must always be a number
-    if (empty.length === fields.length - 1) {
+    if (empty.length === fields.length - 2) {
       //todo are you sure you want to submit?
       this.showMessage(
         'Voce não colocou nenhum critério, deseja enviar vazio?',
@@ -78,7 +84,7 @@ class AvaliationPanel extends React.Component {
     } else {
       if (message !== '') {
         this.showMessage(
-          `Voce pode deixar os camps vazios caso nao queira julgar ${message}`,
+          `${message}`,
           {
             text: 'Ok',
             function: () => {
@@ -137,7 +143,7 @@ class AvaliationPanel extends React.Component {
     ) : (
       <div className="avaliation">
         <div>
-          Clicks(60%)
+          Clicks
           <input
             type="text"
             onChange={(e) => this.setState({ clicks: e.target.value })}
@@ -147,7 +153,7 @@ class AvaliationPanel extends React.Component {
         </div>
         {/* todo make up and down arrow */}
         <div>
-          Coreografia(10%)
+          Musicalidade/Performance
           <input
             type="text"
             onChange={(e) => this.setState({ coreografia: e.target.value })}
@@ -155,7 +161,7 @@ class AvaliationPanel extends React.Component {
           />
         </div>
         <div>
-          Diversidade(10%)
+          Originalidade
           <input
             type="text"
             onChange={(e) => this.setState({ diversidade: e.target.value })}
@@ -163,7 +169,7 @@ class AvaliationPanel extends React.Component {
           />
         </div>
         <div>
-          Controle(10%)
+          Controle
           <input
             type="text"
             onChange={(e) => this.setState({ controle: e.target.value })}
@@ -171,7 +177,7 @@ class AvaliationPanel extends React.Component {
           />
         </div>
         <div>
-          Execução(10%)
+          Carisma/Presença
           <input
             type="text"
             onChange={(e) => this.setState({ execucao: e.target.value })}

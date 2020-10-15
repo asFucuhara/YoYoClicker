@@ -41,7 +41,7 @@ body {
   width: 100%;
 }
 
-.main {
+main {
   display: grid;
   grid-template-rows: 100px 10fr 5fr;
   justify-items: center;

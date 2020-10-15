@@ -1,15 +1,16 @@
+// @ts-nocheck
 import React from 'react';
 import socketIOClient from 'socket.io-client';
 
-import Control from './Control';
-import Judges from './Judges';
-import LoginCard from './LoginCard';
-import AdminPanel from './AdminPanel';
-import AvaliationPanel from './AvaliationPanel';
+import Control from '../Components/Control';
+import Judges from '../Components/JudgesList';
+import LoginCard from '../Components/LoginCard';
+import AdminPanel from '../Components/AdminPanel';
+import AvaliationPanel from '../Components/AvaliationPanel';
 
-import './App.css';
+import '../Components/App.css';
 
-class App extends React.Component {
+class Temp extends React.Component {
   state = {
     isAuth: false, //false
     isAdmin: false,
@@ -24,11 +25,12 @@ class App extends React.Component {
     },
   };
 
-  //var used in application on "this" context
+  //var used in Temp
+  //application on "this" context
   //socket
-  socket = undefined;
+  socket: any;
   //player object, has control over player and states
-  player = undefined;
+  //player = undefined;
   //Video id of currently playing
   videoId = '3US1fbmwZ40';
   //controls when player is ready
@@ -48,7 +50,7 @@ class App extends React.Component {
       this.socket.emit('authentication', params);
 
       //handling authentication
-      this.socket.on('unauthorized', (e) => alert(e.message));
+      this.socket.on('unauthorized', (e: Error) => alert(e.message));
       this.socket.on('authenticated', (data) => {
         const { isAdmin, id } = data;
         this.clientId = id;
@@ -378,7 +380,7 @@ class App extends React.Component {
             Esperando Admin Iniciar: ?? segundos
           </div>
         ) : null}
-        <div className="App">
+        <div className="Temp">
           <div className="header">Campeonato de Yoyo Online</div>
           {this.state.isAuth ? (
             <div className="main">
@@ -413,4 +415,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default Temp;
