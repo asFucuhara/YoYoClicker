@@ -90,6 +90,12 @@ module.exports = (server) => {
       socket.broadcast.emit('clicked', data);
     });
 
+    socket.on('getClickerList', (data) => {
+      //broadcast
+      socket.emit('clickerList', clickerList);
+    });
+    clickerList
+
     socket.on('save', async (data) => {
       console.log(data);
       const score = new scoreModel(data);

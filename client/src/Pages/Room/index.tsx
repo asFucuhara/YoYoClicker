@@ -213,6 +213,20 @@ const Room: React.FC<RoomProps> = (props) => {
       }
       setClicker(newClickers);
     },
+    clickerList: (data: Array<Judge>) => {
+      const newClickerList = [...clickers.list];
+      const newClickersObject = { ...clickers.objects };
+      data.forEach((judge) => {
+        if (
+          judge.id !== session.clientId &&
+          !newClickerList.find((id) => id === judge.id)
+        ) {
+          newClickerList.push(judge.id);
+          newClickersObject[judge.id] = judge;
+        }
+      });
+      setClicker({ list: newClickerList, objects: newClickersObject });
+    },
     saved: () => {
       setPositive(0);
       setNegative(0);
@@ -298,6 +312,7 @@ const Room: React.FC<RoomProps> = (props) => {
       session.socket.on(key, socketFunctions[key]);
       console.log(key);
     });
+    session.socket.emit('getClickerList');
   }, [socketFunctions, player]);
 
   useEffect(() => {
