@@ -191,7 +191,7 @@ const Room: React.FC<RoomProps> = (props) => {
       const newClickersObject: ClickersObject = {};
       Object.keys(clickers.objects).forEach((key) => {
         if (clickers.objects[key].id !== data.id) {
-          newClickersObject[key] = data;
+          newClickersObject[key] = clickers.objects[key];
         }
       });
 
