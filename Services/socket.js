@@ -94,7 +94,6 @@ module.exports = (server) => {
       //broadcast
       socket.emit('clickerList', clickerList);
     });
-    clickerList
 
     socket.on('save', async (data) => {
       console.log(data);
