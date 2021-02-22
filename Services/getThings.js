@@ -10,22 +10,39 @@ const userModel = mongoose.model('User');
 const scoreModel = mongoose.model('Score');
 const clickHistoryModel = mongoose.model('ClickHistory');
 
-mongoose.connect(
-  process.env.MONGOURL || 'mongodb://localhost:27017/YoyoClicker-Dev',
-  { useNewUrlParser: true },
-  (error) => (error ? console.error('Db:', error) : console.log('Db Connected'))
+mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true }, (error) =>
+  error ? console.error('Db:', error) : console.log('Db Connected')
 );
 
 const getScore = async () => {
+  const mapa = {
+    Tb1vTLkv15Y: 'BETTY GALLEGOS',
+    nVlwNQ4mYJA: 'SEBASTIAN LAVIN',
+    DvpFzR7toHk: 'EMILIANO RIVERO',
+    'i-Hl5a34jGw': 'MARTIN MUÑOZ',
+    'rH2qIo-y13U': 'ANIBAL ROJAS',
+    '2yiHIeBo52s': 'IGNACIO FERNANDEZ',
+    RWWwp119GN8: 'MATIAS JENSEN',
+    '5AxKnpcm6H8': 'KEVIN GONZALEZ',
+    '2UsrHfSdczE': 'JOSUE VILLAMAR',
+    cGAS_5LQgL4: 'DANIEL BORGES',
+    'MnMy9-UCTWE': 'GUILHERME FRAGOSO',
+    WOheLIxhjqI: 'PATRCIK RONCOSKI',
+    UdydTULJ_YQ: 'HIDEKI YASSUDA',
+    wtGxXekSbsc: 'RAFAEL YURI',
+    xL8h8XtkpmI: 'ANDRE SHINDI FUCUHARA',
+    IjyIsHUTj1c: 'JONES ROGER',
+    'aDf-SPEY-xk': 'MATHIAS FERNANDEZ',
+    GuBD1SfcxNI: 'FARID BERMUDEZ',
+  };
+
   const json = await scoreModel
     .find({
-      clicks: {
-        $gt: 0,
-      },
+      videoId: { $in: Object.keys(mapa) },
     })
     .populate('clicker');
-  console.log('ok');
-  // mapa = {
+  console.log(json, 'aaaa');
+  // const mapa = {
   //   WtDjDxdytNU: '1A Felipe',
   //   Go7n2Dk_4Y: '1A Patrick Ronckoski',
   //   IM2dazr1VCU: '1A Guxtavo amaral',
@@ -47,7 +64,6 @@ const getScore = async () => {
   // };
 
   const processed = json.map((object) => {
-    console.log(object);
     if (object) {
       const {
         clicks,
@@ -72,3 +88,5 @@ const getScore = async () => {
   });
   console.log(JSON.stringify(processed));
 };
+
+getScore();
