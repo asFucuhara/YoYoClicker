@@ -76,7 +76,6 @@ module.exports = (server) => {
 
     socket.on('disconnect', () => {
       //todo clickerList = [{id: _id, img, name, positive: 0, negative: 0 }]
-      //todo doing
       clickerList = clickerList.filter(
         (clickerObject) => socket.clientId !== clickerObject.id
       );
@@ -112,8 +111,8 @@ module.exports = (server) => {
       //save summary of clicks
       //save as user ended
       //todo when ever user ended give ok for admin change video
-      const clickHistory = new clickHistoryModel(data);
-      await clickHistory.save();
+      // const clickHistory = new clickHistoryModel(data);
+      // await clickHistory.save();
       socket.emit('clickHistorySaved');
     });
 
@@ -125,7 +124,7 @@ module.exports = (server) => {
       //change state to paused
       isPlaying = false;
       //broadcast video change
-      socket.emit('videoChange', data);
+      io.emit('videoChange', data);
     });
 
     socket.on('videoStart', () => {
@@ -135,7 +134,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      socket.emit('videoStart');
+      io.emit('videoStart');
     });
 
     socket.on('videoPause', () => {
@@ -143,7 +142,7 @@ module.exports = (server) => {
       //todo:check admin
       //todo:chack if can start
       //broadcast
-      socket.emit('videoPause');
+      io.emit('videoPause');
     });
 
     socket.on('videoRestart', () => {
@@ -153,7 +152,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      socket.emit('videoRestart');
+      io.emit('videoRestart');
     });
 
     socket.on('forceFinishVideo', () => {
