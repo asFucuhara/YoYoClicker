@@ -33,9 +33,7 @@ const Player: React.FC<PlayerProps> = (props) => {
   const onReadyWrapper: YouTubeProps['onReady'] = (event) => {
     if (props.setPlayerRef) {
       props.setPlayerRef(event.target);
-      console.log('jobs done', event.target);
     }
-    console.log('isso');
 
     if (props.videoEvents.onReady) {
       props.videoEvents.onReady(event);
