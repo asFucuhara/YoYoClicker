@@ -6,6 +6,14 @@ export interface VideoEvents {
   onStateChange: YouTubeProps['onStateChange'];
 }
 
+export interface PlayerControl {
+  playVideo: () => void;
+  cueVideoById: (videoId: string) => void;
+  pauseVideo: () => void;
+  playerInfo: { videoData: { video_id: '' } };
+  seekTo: (time: number, allowSeekAhead: boolean) => void;
+}
+
 export interface PlayerProps {
   videoEvents: VideoEvents;
   videoId?: string;
@@ -27,6 +35,8 @@ const Player: React.FC<PlayerProps> = (props) => {
       props.setPlayerRef(event.target);
       console.log('jobs done', event.target);
     }
+    console.log('isso');
+
     if (props.videoEvents.onReady) {
       props.videoEvents.onReady(event);
     }
