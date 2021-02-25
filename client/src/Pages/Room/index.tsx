@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import Header from '../../Components/Header';
-import JudgesList, {
-  Clickers,
-  ClickersObject,
-  Judge,
-} from '../../Components/JudgesList';
+import JudgesList, { Clickers } from '../../Components/JudgesList';
 import AdminPanel from '../../Components/AdminPanel';
 import Footer from '../../Components/Footer';
 
@@ -18,19 +14,6 @@ import socketManager from './socketManager';
 
 interface RoomProps {}
 
-interface ClickedData {
-  id: string;
-  click: boolean;
-}
-interface VideoChangeData {
-  videoId: string;
-}
-interface SyncClickData {
-  id: string;
-  positive: number;
-  negative: number;
-}
-
 const Room: React.FC<RoomProps> = (props) => {
   if (!session.socket.connected) {
     history.push('/');
@@ -40,7 +23,7 @@ const Room: React.FC<RoomProps> = (props) => {
   //const clickHistory = [];
 
   //*States
-  const [clickers, setClicker] = useState<Clickers>({ list: [], objects: {} });
+  const [clickers, setClickers] = useState<Clickers>({ list: [], objects: {} });
   const [playerControl, setPlayerControl] = useState<PlayerControl>({
     playVideo: () => {},
     cueVideoById: (videoId: string) => {},
@@ -117,6 +100,14 @@ const Room: React.FC<RoomProps> = (props) => {
     }, 1000);
   };
 
+  const resetVariables = () => {
+    setPositive(0);
+    setNegative(0);
+    setScore(0);
+    setShowAvaliationPanel(false);
+    setIsBlocked(true);
+  };
+
   //Video Events
   const videoEvents = {
     onReady: (event) => {
@@ -124,11 +115,10 @@ const Room: React.FC<RoomProps> = (props) => {
       playerControl.playVideo();
       playerControl.pauseVideo();
       //this.timeManager.restart();
-      console.log('player Ready');
 
-      //Socket configuration that must be done after player is ready
-      //!change for new format/
-      subscibeAllSocketEvents(playerControl);
+      //Socket configuration and subscription
+      socketManager.setPlayerControl(playerControl);
+      socketManager.subscribeSocketListeners();
       session.socket.emit('getClickerList');
     },
     onStateChange: (event) => {
@@ -175,187 +165,6 @@ const Room: React.FC<RoomProps> = (props) => {
     },
   } as VideoEvents;
 
-  //socket events
-  console.log('yooo', socketManager.socket);
-  //todo make a socket subscribing controller
-  //!transfer noNeedPlayer to sockets manager
-  //events that dont need player
-  const noNeedPlayerSocketEvents = {
-    clicked: (data: ClickedData) => {
-      //data = {id, click: true} //true positive/ false negative
-      console.log(data, clickers);
-      const { id, click } = data;
-      const newClickers = { ...clickers };
-
-      //todo: flash
-      if (click) {
-        flash(id, 'flashPositive');
-        newClickers.objects[id].positive += 1;
-        //!Erro newClickers.objects[id] is undefined
-      } else {
-        flash(id, 'flashNegative');
-        newClickers.objects[id].negative += 1;
-      }
-      setClicker(newClickers);
-    },
-  };
-  //subscribing functions to eventlistener
-  (Object.keys(noNeedPlayerSocketEvents) as Array<
-    keyof typeof noNeedPlayerSocketEvents
-  >).forEach((key) => {
-    console.log('subscribed:', key);
-    session.socket.removeListener(key);
-    session.socket.on(key, noNeedPlayerSocketEvents[key]);
-  });
-
-  //!transfer need player to sockets manager
-  //events that need player
-  const subscibeAllSocketEvents = (playerControl: PlayerControl) => {
-    //have to run once after player is mouted
-    //adding all receiving messages from socket
-
-    //defining all functions
-    const socketFunctions = {
-      newClicker: (data: Judge) => {
-        const newClickerList = [...clickers.list];
-        const newClickersObject = { ...clickers.objects };
-        console.log('newClicker');
-        if (
-          data.id !== session.clientId &&
-          !newClickerList.find((id) => id === data.id)
-        ) {
-          newClickerList.push(data.id);
-          newClickersObject[data.id] = data;
-        }
-
-        setClicker({ list: newClickerList, objects: newClickersObject });
-      },
-      removeClicker: (data: Judge) => {
-        const newClickerList = clickers.list.filter((id) => id !== data.id);
-        const newClickersObject: ClickersObject = {};
-        Object.keys(clickers.objects).forEach((key) => {
-          if (clickers.objects[key].id !== data.id) {
-            newClickersObject[key] = clickers.objects[key];
-          }
-        });
-
-        setClicker({ list: newClickerList, objects: newClickersObject });
-      },
-      //todo bugged: clicker cannot get a reference from here, maybe insulate dom|Socket|data manipulation
-      // clicked: (data: ClickedData) => {
-      //   //data = {id, click: true} //true positive/ false negative
-      //   console.log(data, clickers);
-      //   const { id, click } = data;
-      //   const newClickers = { ...clickers };
-
-      //   //todo: flash
-      //   if (click) {
-      //     flash(id, 'flashPositive');
-      //     newClickers.objects[id].positive += 1;
-      //     //!Erro newClickers.objects[id] is undefined
-      //   } else {
-      //     flash(id, 'flashNegative');
-      //     newClickers.objects[id].negative += 1;
-      //   }
-      //   setClicker(newClickers);
-      // },
-      clickerList: (data: Array<Judge>) => {
-        const newClickerList = [...clickers.list];
-        const newClickersObject = { ...clickers.objects };
-        data.forEach((judge) => {
-          if (
-            judge.id !== session.clientId &&
-            !newClickerList.find((id) => id === judge.id)
-          ) {
-            newClickerList.push(judge.id);
-            newClickersObject[judge.id] = judge;
-          }
-        });
-        setClicker({ list: newClickerList, objects: newClickersObject });
-      },
-      saved: () => {
-        setPositive(0);
-        setNegative(0);
-        setScore(0);
-        setShowAvaliationPanel(false);
-        setIsBlocked(true);
-
-        // this.clickHistory = [];
-        // this.timeManager.restart();
-        console.log('saved');
-      },
-      // clickHistorySaved: () => {
-      //   console.log('clickHistorySaved');
-      // },
-      syncClick: (data: SyncClickData) => {
-        //data = {id, positivo, negativo};
-        const { id, positive, negative } = data;
-        const newClickersObject = { ...clickers.objects };
-        newClickersObject[id].positive = positive;
-        newClickersObject[id].negative = negative;
-        setClicker({ objects: newClickersObject, list: clickers.list });
-      },
-      videoChange: (data: VideoChangeData) => {
-        // this.videoId = data.videoId;
-        // this.playerControl.cueVideoById(data.videoId);
-        // this.save({ clicks: this.state.score });
-
-        //change Player Video
-        console.log(playerControl);
-        playerControl.cueVideoById(data.videoId);
-        //restart variables
-        setIsBlocked(true);
-        setPositive(0);
-        setNegative(0);
-        setScore(0);
-        setShowAvaliationPanel(false);
-        // this.clickHistory = [];
-        // this.timeManager.restart();
-        console.log('messsage received' + data.videoId);
-      },
-      videoStart: () => {
-        console.log('videostart');
-        timerDisplay(3, true, () => playerControl.playVideo(), '');
-      },
-      videoPause: () => {
-        console.log('video pause');
-        timerDisplay(
-          0,
-          false,
-          () => playerControl.pauseVideo(),
-          'Pausado pelo Admin'
-        );
-        // console.log('messsage received' + data);
-      },
-      videoRestart: () => {
-        console.log('video restart');
-        playerControl.pauseVideo();
-        playerControl.seekTo(0, false);
-        //timeManager.restart();
-        timerDisplay(
-          0,
-          false,
-          () => playerControl.pauseVideo(),
-          'Reiniciado pelo Admin'
-        );
-        //todo zero all variables
-      },
-      forceFinishVideo: () => {
-        //data = true
-        console.log('messsage received, force restart');
-      },
-    };
-
-    //subscribing functions to eventlistener
-    (Object.keys(socketFunctions) as Array<
-      keyof typeof socketFunctions
-    >).forEach((key) => {
-      console.log('subscribed:', key);
-      session.socket.removeListener(key);
-      session.socket.on(key, socketFunctions[key]);
-    });
-  };
-
   //todo: evals poteintial bugs
   const saveEval = (data: any) => {
     socket.emit('save', {
@@ -367,7 +176,17 @@ const Room: React.FC<RoomProps> = (props) => {
 
   //*Effects
   useEffect(() => {
-    //todo clickerList on socket manager update
+    //update clickers on socket manager
+    socketManager.updateClickers(clickers);
+  }, [clickers]);
+
+  useEffect(() => {
+    //update clickersDispather on socket manager
+    socketManager.setClickersDispatcher(setClickers);
+    socketManager.setFlash(flash);
+    socketManager.setSession(session);
+    socketManager.setTimerDisplay(timerDisplay);
+    socketManager.setResetVariables(resetVariables);
   }, []);
 
   return (
