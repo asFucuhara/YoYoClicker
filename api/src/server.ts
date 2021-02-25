@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import cors from 'cors';
 
 import config from './config';
 import routes from './routes';
@@ -10,11 +11,18 @@ const app = express();
 //Starting db
 mongoConnect(config.mongoURL);
 
+//Cors Setup
+const corsOptions = {
+  credentials: true,
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 //Epress Setup
 app.use(express.json());
 //route
 routes(app);
-
 
 if (process.env.NODE_ENV === 'production') {
   //todo: change for correct path or with ngnix
@@ -29,7 +37,6 @@ if (process.env.NODE_ENV === 'production') {
     res.send('ok....');
   });
 }
-
 
 app.listen(config.PORT, () =>
   console.log('Server Running on PORT:', config.PORT)

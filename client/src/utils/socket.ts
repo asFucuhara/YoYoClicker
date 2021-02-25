@@ -14,7 +14,7 @@ export const session = {
 
 export const socketAuthenticate = (params = {}) => {
   //connect socket
-  const socket = socketIOClient('https://yoyo-clicker2.herokuapp.com/');
+  const socket = socketIOClient('localhost:5000');
 
   return new Promise((resolve, reject) => {
     socket.on('connect', () => {
@@ -31,7 +31,8 @@ export const socketAuthenticate = (params = {}) => {
         session.isAuth = true;
         session.socket = socket;
         session.clientId = data.id;
-        resolve();
+        //todo resolve response
+        resolve(true);
       });
     });
   });
