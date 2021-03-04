@@ -1,15 +1,13 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const http = require('http');
-const path = require('path');
+import express from 'express';
+import mongoose from 'mongoose';
+import * as http from 'http';
+import path from 'path';
+import config from './config';
 
 //mongoose setup
 mongoose.Promise = global.Promise;
-require('./Models/Score');
-require('./Models/User');
-require('./Models/ClickHistory');
 mongoose.connect(
-  process.env.MONGOURL || 'mongodb://localhost:27017/YoyoClicker-Dev',
+  process.env.MONGOURL || config.mongoURL,
   { useNewUrlParser: true },
   (error) => (error ? console.error('Db:', error) : console.log('Db Connected'))
 );
@@ -32,5 +30,5 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const port = process.env.PORT || 5000;
+const port = config.PORT;
 server.listen(port, () => console.log('Server listeningn on port: ' + port));

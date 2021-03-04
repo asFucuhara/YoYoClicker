@@ -1,23 +1,57 @@
-const socketIo = require('socket.io');
-const socketIoAuth = require('socketio-auth');
-const mongoose = require('mongoose');
+import socketIo, { Socket } from 'socket.io';
+import socketIoAuth from 'socketio-auth';
 
-const userModel = mongoose.model('User');
-const scoreModel = mongoose.model('Score');
-const clickHistoryModel = mongoose.model('ClickHistory');
+import userModel from '../database/models/User';
+import scoreModel from '../database/models/Score';
+import roomModel from '../database/models/Room';
 
-module.exports = (server) => {
+import { Server } from 'http';
+
+// const userModel = mongoose.model('User');
+// const scoreModel = mongoose.model('Score');
+// const clickHistoryModel = mongoose.model('ClickHistory');
+
+interface AuthData {
+  isNew: boolean;
+  email: string;
+  name: string;
+  code: string;
+}
+
+interface SocketPlus extends Socket {
+  clientId?: string;
+}
+
+interface Clicker {
+  id: string;
+  img: string;
+  name: string;
+  positive: number;
+  negative: number;
+}
+
+function getRoom(socket: SocketPlus) {
+  console.log('rooms:', socket.rooms, socket.id);
+  const filteredRooms = Object.keys(socket.rooms).filter(
+    (key) => key !== socket.id
+  );
+
+  //for now return just first room
+  return filteredRooms[0];
+}
+
+module.exports = (server: Server) => {
   const io = socketIo(server);
 
   //todo room implementation
   //todo variable room rules(clicks + eval) implementation
   //todo clickerList = {id:{ id: _id, img, name, positive: 0, negative: 0 }, list:[ids...]}
-  let clickerList = [];
+  let clickerList = [] as Array<Clicker>;
   let isPlaying = false;
 
   //socket authentication
   socketIoAuth(io, {
-    authenticate: async (socket, data, callback) => {
+    authenticate: async (socket: SocketPlus, data: AuthData, callback) => {
       //todo if playing display to user and make it wait for next video
       //todo declutter leave only authentication process here, move anything else to on conected
       //! remove sign up for mvp
@@ -39,7 +73,7 @@ module.exports = (server) => {
             socket.clientId = _id;
             clickerList.push(newClicker);
             socket.broadcast.emit('newClicker', newClicker);
-            callback(null, { id: newUser._id, clickerList, code });
+            callback(undefined, { id: newUser._id, clickerList, code });
           } catch (e) {
             //todo check //callback(e);
             callback(new Error(e));
@@ -60,7 +94,7 @@ module.exports = (server) => {
             clickerList.push(newClicker);
             socket.broadcast.emit('newClicker', newClicker);
           }
-          callback(null, { id: user._id, isAdmin, clickerList });
+          callback(undefined, { id: user._id, isAdmin, clickerList });
         } else {
           callback(new Error('Código invalido'));
         }
@@ -70,8 +104,11 @@ module.exports = (server) => {
     disconnect: () => {},
   });
 
-  io.on('connection', (socket) => {
+  //todo change socket to be Socket + clientId and Room
+  io.on('connection', (socket: SocketPlus) => {
     console.log(`New client connected`);
+    //todo remove
+    socket.join('test');
 
     socket.on('disconnect', () => {
       //todo clickerList = [{id: _id, img, name, positive: 0, negative: 0 }]
@@ -79,7 +116,7 @@ module.exports = (server) => {
         (clickerObject) => socket.clientId !== clickerObject.id
       );
       socket.broadcast
-        .to(socket.room)
+        .to(getRoom(socket))
         .emit('removeClicker', { id: socket.clientId });
       console.log('Client disconnected');
     });
@@ -94,7 +131,7 @@ module.exports = (server) => {
     //clicked(positive or negative) || clicked(update score)
     socket.on('clicked', (data) => {
       //broadcast
-      socket.broadcast.to(socket.room).emit('clicked', data);
+      socket.broadcast.to(getRoom(socket)).emit('clicked', data);
     });
 
     socket.on('getClickerList', (data) => {
@@ -108,7 +145,7 @@ module.exports = (server) => {
       console.log(score);
       await score.save();
       socket.emit('saved');
-      socket.broadcast.to(socket.room).emit('syncClick', {
+      socket.broadcast.to(getRoom(socket)).emit('syncClick', {
         id: socket.clientId,
         positive: 0,
         negative: 0,
@@ -132,7 +169,7 @@ module.exports = (server) => {
       //change state to paused
       isPlaying = false;
       //broadcast video change
-      io.in(socket.room).emit('videoChange', data);
+      io.in(getRoom(socket)).emit('videoChange', data);
     });
 
     socket.on('videoStart', () => {
@@ -142,7 +179,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      io.in(socket.room).emit('videoStart');
+      io.in(getRoom(socket)).emit('videoStart');
     });
 
     socket.on('videoPause', () => {
@@ -150,7 +187,7 @@ module.exports = (server) => {
       //todo:check admin
       //todo:chack if can start
       //broadcast
-      io.in(socket.room).emit('videoPause');
+      io.in(getRoom(socket)).emit('videoPause');
     });
 
     socket.on('videoRestart', () => {
@@ -160,7 +197,7 @@ module.exports = (server) => {
       //change state to playing
       isPlaying = true;
       //broadcast
-      io.in(socket.room).emit('videoRestart');
+      io.in(getRoom(socket)).emit('videoRestart');
     });
 
     socket.on('forceFinishVideo', () => {
