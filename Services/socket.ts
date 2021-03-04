@@ -144,6 +144,17 @@ module.exports = (server: Server) => {
       socket.emit('rooms', rooms);
     });
 
+    socket.on('joinRoom', async (data: { id: string }) => {
+      const room = await roomModel.findById(data.id);
+      if (room) {
+        socket.leaveAll();
+        socket.join(data.id);
+        socket.emit('joinedRoom', room);
+      } else {
+        socket.emit('joinRoomError', { message: 'cannot find room' });
+      }
+    });
+
     socket.on('save', async (data) => {
       console.log(data);
       const score = new scoreModel(data);
