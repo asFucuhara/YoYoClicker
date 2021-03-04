@@ -139,6 +139,11 @@ module.exports = (server: Server) => {
       socket.emit('clickerList', clickerList);
     });
 
+    socket.on('getRooms', async () => {
+      const rooms = await roomModel.find();
+      socket.emit('rooms', rooms);
+    });
+
     socket.on('save', async (data) => {
       console.log(data);
       const score = new scoreModel(data);
