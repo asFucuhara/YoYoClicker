@@ -13,9 +13,9 @@ const App = function () {
   return (
     <Router history={history}>
       <Route path="/" exact render={() => <Login />} />
-      <Route path="/room" exact render={() => <Room />} />
+      <Route path="/room/:roomId" exact component={Room} />
       {/* <Route path="/room/:id" render={() => <Room />} /> */}
-      {/* <Route path="/rooms" component={<div />} /> */}
+      <Route path="/room" exact component={Rooms} />
     </Router>
   );
 };

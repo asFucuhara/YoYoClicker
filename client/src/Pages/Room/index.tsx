@@ -11,8 +11,12 @@ import AvaliationPanel from '../../Components/AvaliationPanel';
 import Player, { VideoEvents, PlayerControl } from '../../Components/Player';
 import history from '../../utils/history';
 import socketManager from './socketManager';
+import { RouteComponentProps } from 'react-router-dom';
 
-interface RoomProps {}
+interface MatchParams {
+  roomId: string;
+}
+interface RoomProps extends RouteComponentProps<MatchParams> {}
 
 const Room: React.FC<RoomProps> = (props) => {
   if (!session.socket.connected) {
@@ -188,6 +192,11 @@ const Room: React.FC<RoomProps> = (props) => {
     socketManager.setTimerDisplay(timerDisplay);
     socketManager.setResetVariables(resetVariables);
   }, []);
+
+  useEffect(() => {
+    const roomId = props.match.params.roomId;
+    socket.emit('joinRoom', { roomId });
+  });
 
   return (
     <>

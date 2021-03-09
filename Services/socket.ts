@@ -31,7 +31,6 @@ interface Clicker {
 }
 
 function getRoom(socket: SocketPlus) {
-  console.log('rooms:', socket.rooms, socket.id);
   const filteredRooms = Object.keys(socket.rooms).filter(
     (key) => key !== socket.id
   );
@@ -46,7 +45,8 @@ module.exports = (server: Server) => {
   //todo room implementation
   //todo variable room rules(clicks + eval) implementation
   //todo clickerList = {id:{ id: _id, img, name, positive: 0, negative: 0 }, list:[ids...]}
-  let clickerList = [] as Array<Clicker>;
+  //todo send to redis
+  let clickerList = {} as { [roomId: string]: Array<Clicker> };
   let isPlaying = false;
 
   //socket authentication
@@ -68,33 +68,25 @@ module.exports = (server: Server) => {
           const newUser = new userModel({ email, name, code });
           try {
             await newUser.save();
-            const { _id, img, name } = newUser;
-            const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
+            const { _id } = newUser;
             socket.clientId = _id;
-            clickerList.push(newClicker);
-            socket.broadcast.emit('newClicker', newClicker);
-            callback(undefined, { id: newUser._id, clickerList, code });
+            callback(undefined, { id: newUser._id });
           } catch (e) {
-            //todo check //callback(e);
             callback(new Error(e));
           }
         } else {
           //alredy exist
-          callback(new Error('Email já cadastrado'));
+          callback(new Error('Usuário já existente'));
         }
       } else {
         //authenticate
         const { email, code } = data;
         const user = await userModel.findOne({ email });
         if (user) {
-          const { _id, img, name, isAdmin } = user;
-          if (!isAdmin) {
-            const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
-            socket.clientId = _id;
-            clickerList.push(newClicker);
-            socket.broadcast.emit('newClicker', newClicker);
-          }
-          callback(undefined, { id: user._id, isAdmin, clickerList });
+          const { _id } = user;
+          socket.clientId = _id;
+          //todo change what to send to client
+          callback(undefined, { id: user._id });
         } else {
           callback(new Error('Código invalido'));
         }
@@ -107,26 +99,21 @@ module.exports = (server: Server) => {
   //todo change socket to be Socket + clientId and Room
   io.on('connection', (socket: SocketPlus) => {
     console.log(`New client connected`);
-    //todo remove
-    socket.join('test');
 
     socket.on('disconnect', () => {
       //todo clickerList = [{id: _id, img, name, positive: 0, negative: 0 }]
-      clickerList = clickerList.filter(
-        (clickerObject) => socket.clientId !== clickerObject.id
-      );
-      socket.broadcast
-        .to(getRoom(socket))
-        .emit('removeClicker', { id: socket.clientId });
+      //maybe broadcast clickerList instead of the clicker that was removed
+      const room = getRoom(socket);
+      if (room) {
+        clickerList[room] = clickerList[room].filter(
+          (clickerObject) => socket.clientId !== clickerObject.id
+        );
+        socket.broadcast
+          .to(room)
+          .emit('removeClicker', { id: socket.clientId });
+      }
       console.log('Client disconnected');
     });
-
-    //todo joinRoom()
-    //todo change for dynamic aproach
-    //  const room = 'staticRoom';
-    //  socket.join(room);
-    //  //?todo maybe change to handle everything with socket.rooms.forEach() | maybe not necessary since the user wiil only be connect to 1 socket at a time
-    //  socket.room = room;
 
     //clicked(positive or negative) || clicked(update score)
     socket.on('clicked', (data) => {
@@ -134,9 +121,13 @@ module.exports = (server: Server) => {
       socket.broadcast.to(getRoom(socket)).emit('clicked', data);
     });
 
-    socket.on('getClickerList', (data) => {
+    socket.on('getClickerList', (data: { roomId: string }) => {
+      if (!clickerList[getRoom(socket)]) {
+        //initiate room in memory
+        clickerList[getRoom(socket)] = [];
+      }
       //broadcast
-      socket.emit('clickerList', clickerList);
+      socket.emit('clickerList', clickerList[getRoom(socket)]);
     });
 
     socket.on('getRooms', async () => {
@@ -144,11 +135,31 @@ module.exports = (server: Server) => {
       socket.emit('rooms', rooms);
     });
 
-    socket.on('joinRoom', async (data: { id: string }) => {
-      const room = await roomModel.findById(data.id);
+    socket.on('joinRoom', async (data: { roomId: string }) => {
+      const room = await roomModel.findById(data.roomId);
+
+      const user = await userModel.findOne({ _id: socket.clientId });
+      //todo change
+      if (!user) {
+        return;
+      }
+      const { _id, img, name } = user;
+
+      //todo add ClickerList handler here'getThings.js
+      //todo add socket broadcast to newClicker
+
+      const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
+
+      if (!clickerList[getRoom(socket)]) {
+        //initiate room in memory
+        clickerList[getRoom(socket)] = [];
+      }
+      clickerList[getRoom(socket)].push(newClicker);
+      socket.broadcast.emit('newClicker', newClicker);
+
       if (room) {
         socket.leaveAll();
-        socket.join(data.id);
+        socket.join(data.roomId);
         socket.emit('joinedRoom', room);
       } else {
         socket.emit('joinRoomError', { message: 'cannot find room' });
