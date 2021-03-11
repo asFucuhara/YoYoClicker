@@ -42,9 +42,7 @@ function getRoom(socket: SocketPlus) {
 module.exports = (server: Server) => {
   const io = socketIo(server);
 
-  //todo room implementation
   //todo variable room rules(clicks + eval) implementation
-  //todo clickerList = {id:{ id: _id, img, name, positive: 0, negative: 0 }, list:[ids...]}
   //todo send to redis
   let clickerList = {} as { [roomId: string]: Array<Clicker> };
   let isPlaying = false;
@@ -53,7 +51,6 @@ module.exports = (server: Server) => {
   socketIoAuth(io, {
     authenticate: async (socket: SocketPlus, data: AuthData, callback) => {
       //todo if playing display to user and make it wait for next video
-      //todo declutter leave only authentication process here, move anything else to on conected
       //! remove sign up for mvp
       const { isNew } = data;
       if (isNew) {
@@ -137,37 +134,38 @@ module.exports = (server: Server) => {
 
     socket.on('joinRoom', async (data: { roomId: string }) => {
       const room = await roomModel.findById(data.roomId);
+      const user = await userModel.findById(socket.clientId);
 
-      const user = await userModel.findOne({ _id: socket.clientId });
-      //todo change
       if (!user) {
-        return;
+        throw new Error('User was not found');
+      }
+      if (!room) {
+        throw new Error('Room was not found');
       }
       const { _id, img, name } = user;
 
-      //todo add ClickerList handler here'getThings.js
-      //todo add socket broadcast to newClicker
-
       const newClicker = { id: _id, img, name, positive: 0, negative: 0 };
 
+      //initiate room in memory
       if (!clickerList[getRoom(socket)]) {
-        //initiate room in memory
         clickerList[getRoom(socket)] = [];
       }
       clickerList[getRoom(socket)].push(newClicker);
       socket.broadcast.emit('newClicker', newClicker);
 
+      //check if user is admin in the room
+      const isAdmin = room.admins.includes(_id);
+
       if (room) {
         socket.leaveAll();
         socket.join(data.roomId);
-        socket.emit('joinedRoom', room);
+        socket.emit('joinedRoom', { ...room, isAdmin });
       } else {
         socket.emit('joinRoomError', { message: 'cannot find room' });
       }
     });
 
     socket.on('save', async (data) => {
-      console.log(data);
       const score = new scoreModel(data);
       console.log(score);
       await score.save();

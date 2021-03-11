@@ -15,11 +15,16 @@ interface SyncClickData {
   negative: number;
 }
 
+interface JoinedRoomData {
+  isAdmin: boolean;
+}
+
 interface SocketManager {
   session: typeof session;
   playerControl: PlayerControl;
   clickers: Clickers;
   clickersDispatcher: React.Dispatch<React.SetStateAction<Clickers>>;
+  isAdminDispatcher: React.Dispatch<React.SetStateAction<boolean>>;
   flash: (elementId: string, cssClass: string) => void;
   timerDisplay: (
     time: number,
@@ -32,6 +37,9 @@ interface SocketManager {
   updateClickers: (clickers: typeof socketManager['clickers']) => void;
   setClickersDispatcher: (
     clickersDispatcher: typeof socketManager['clickersDispatcher']
+  ) => void;
+  setIsAdminDispatcher: (
+    clickersDispatcher: typeof socketManager['isAdminDispatcher']
   ) => void;
   setSession: (session: typeof socketManager['session']) => void;
   setPlayerControl: (player: typeof socketManager['playerControl']) => void;
@@ -48,6 +56,7 @@ const socketManager = {
   playerControl: {},
   clickers: {},
   clickersDispatcher: {},
+  isAdminDispatcher: {},
   flash: {},
   timerDisplay: {},
   resetVariables: {},
@@ -66,6 +75,10 @@ const socketManager = {
   setClickersDispatcher: (clickersDispatcher) => {
     socketManager.clickersDispatcher = clickersDispatcher;
   },
+  setIsAdminDispatcher: (isAdminDispatcher) => {
+    socketManager.isAdminDispatcher = isAdminDispatcher;
+  },
+
   setTimerDisplay: (timerDisplay) => {
     socketManager.timerDisplay = timerDisplay;
   },
@@ -217,6 +230,10 @@ const socketManager = {
         forceFinishVideo: () => {
           //data = true
           console.log('WIP messsage received, force restart');
+        },
+        joinedRoom: (data: JoinedRoomData) => {
+          const { isAdmin } = data;
+          socketManager.isAdminDispatcher(isAdmin);
         },
       };
       (Object.keys(socketFunctions) as Array<

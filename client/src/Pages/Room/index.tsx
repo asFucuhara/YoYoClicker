@@ -14,9 +14,6 @@ import Control from './Components/Control';
 import AvaliationPanel from './Components/AvaliationPanel';
 import Player, { VideoEvents, PlayerControl } from './Components/Player';
 
-
-
-
 interface MatchParams {
   roomId: string;
 }
@@ -27,7 +24,7 @@ const Room: React.FC<RoomProps> = (props) => {
     history.push('/');
   }
 
-  const { isAdmin, socket } = session;
+  const { socket } = session;
   //const clickHistory = [];
 
   //todo remove later
@@ -54,7 +51,7 @@ const Room: React.FC<RoomProps> = (props) => {
   });
 
   const [showAvaliation, setShowAvaliationPanel] = useState(false);
-  const [showAdminControls] = useState(isAdmin);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isBlocked, setIsBlocked] = useState(true);
 
   //states for score
@@ -204,6 +201,7 @@ const Room: React.FC<RoomProps> = (props) => {
   useEffect(() => {
     //update clickersDispather on socket manager
     socketManager.setClickersDispatcher(setClickers);
+    socketManager.setIsAdminDispatcher(setIsAdmin);
     socketManager.setFlash(flash);
     socketManager.setSession(session);
     socketManager.setTimerDisplay(timerDisplay);
@@ -230,7 +228,7 @@ const Room: React.FC<RoomProps> = (props) => {
           videoId="3US1fbmwZ40"
           setPlayerRef={setPlayerControl}
         />
-        {showAdminControls ? (
+        {isAdmin ? (
           <AdminPanel socket={socket} />
         ) : showAvaliation ? (
           <AvaliationPanel save={saveEval} clicks={score} />
