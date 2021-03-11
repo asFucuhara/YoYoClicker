@@ -1,5 +1,5 @@
-import { Clickers, ClickersObject, Judge } from '../../Components/JudgesList';
-import { PlayerControl } from '../../Components/Player';
+import { Clickers, ClickersObject, Judge } from './Components/JudgesList';
+import { PlayerControl } from './Components/Player';
 import { session } from '../../utils/socket';
 
 interface ClickedData {
