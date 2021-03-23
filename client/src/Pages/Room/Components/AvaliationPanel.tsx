@@ -3,12 +3,22 @@ import React, { useState } from 'react';
 interface AvaliationPanelProps {
   clicks: number;
   save(data: any): void;
+  evalRules: EvalRules;
 }
 
 interface MessageConfig {
   function(): void;
   text: string;
   hide?: boolean;
+}
+
+export interface EvalRules {
+  total: number;
+  keys: Array<keyof EvalRules['values']>;
+  values: {
+    [key: string]: { weight: number; type: string; title: string };
+  };
+  click: { weight: number; type: string; title: string };
 }
 
 const AvaliationPanel = (props: AvaliationPanelProps) => {
@@ -26,10 +36,6 @@ const AvaliationPanel = (props: AvaliationPanelProps) => {
   });
 
   const [evals, setEvals] = useState<{ [key: string]: string }>({
-    coreografia: '',
-    diversidade: '',
-    controle: '',
-    execucao: '',
     clicks: props.clicks.toString(),
   });
 
@@ -51,9 +57,6 @@ const AvaliationPanel = (props: AvaliationPanelProps) => {
       }
     });
 
-    //todo change
-    const { clicks, coreografia, diversidade, controle, execucao } = evals;
-
     //clicks must always be a number
     if (empty.length === Object.keys(evals).length - 1) {
       //todo are you sure you want to submit?
@@ -62,13 +65,7 @@ const AvaliationPanel = (props: AvaliationPanelProps) => {
         {
           text: 'Sim',
           function: () => {
-            props.save({
-              clicks,
-              coreografia,
-              diversidade,
-              controle,
-              execucao,
-            });
+            props.save({ ...evals });
             showMessageFunction('Salvando...');
           },
         },
@@ -88,13 +85,7 @@ const AvaliationPanel = (props: AvaliationPanelProps) => {
           },
         });
       } else {
-        props.save({
-          clicks,
-          coreografia,
-          diversidade,
-          controle,
-          execucao,
-        });
+        props.save({ ...evals });
         showMessageFunction('Salvando...');
       }
     }
@@ -136,41 +127,19 @@ const AvaliationPanel = (props: AvaliationPanelProps) => {
           disabled
         />
       </div>
-      {
-        //todo change to acomodate dynamically changing things
-      }
-      <div>
-        Musicalidade/Performance
-        <input
-          type="text"
-          onChange={(e) => setEvals({ ...evals, coreografia: e.target.value })}
-          value={evals.coreografia}
-        />
-      </div>
-      <div>
-        Originalidade
-        <input
-          type="text"
-          onChange={(e) => setEvals({ ...evals, diversidade: e.target.value })}
-          value={evals.diversidade}
-        />
-      </div>
-      <div>
-        Controle
-        <input
-          type="text"
-          onChange={(e) => setEvals({ ...evals, controle: e.target.value })}
-          value={evals.controle}
-        />
-      </div>
-      <div>
-        Carisma/Presença
-        <input
-          type="text"
-          onChange={(e) => setEvals({ ...evals, execucao: e.target.value })}
-          value={evals.execucao}
-        />
-      </div>
+      {props.evalRules.keys.map((key) => {
+        const { title } = props.evalRules.values[key];
+        return (
+          <div>
+            {title}
+            <input
+              type="text"
+              onChange={(e) => setEvals({ ...evals, [key]: e.target.value })}
+              value={evals[key]}
+            />
+          </div>
+        );
+      })}
       <div className="save" onClick={save}>
         Save
       </div>

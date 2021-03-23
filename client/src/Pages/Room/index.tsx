@@ -187,9 +187,11 @@ const Room: React.FC<RoomProps> = (props) => {
   } as VideoEvents;
 
   //todo: evals poteintial bugs
-  const saveEval = (data: any) => {
+  const saveEval = (data: { clicks: string; [key: string]: string }) => {
+    const { clicks, ...evaluation } = data;
     socket.emit('save', {
-      ...data,
+      evaluation,
+      clicks,
       clicker: session.clientId,
       videoId: playerControl.playerInfo.videoData.video_id,
     });
@@ -232,6 +234,7 @@ const Room: React.FC<RoomProps> = (props) => {
           <AvaliationPanel
             save={saveEval}
             clicks={score}
+            evalRules={evalRules}
           />
         ) : (
           <Control

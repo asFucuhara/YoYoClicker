@@ -18,6 +18,13 @@ interface AuthData {
   code: string;
 }
 
+interface SaveData {
+  evaluation: { [key: string]: number | string };
+  clicks: number;
+  clicker: string;
+  videoId: string;
+}
+
 interface SocketPlus extends Socket {
   clientId?: string;
 }
@@ -135,6 +142,7 @@ module.exports = (server: Server) => {
     socket.on('joinRoom', async (data: { roomId: string }) => {
       const room = await roomModel.findById(data.roomId);
       const user = await userModel.findById(socket.clientId);
+      console.log('joinRoom');
 
       if (!user) {
         throw new Error('User was not found');
@@ -165,9 +173,19 @@ module.exports = (server: Server) => {
       }
     });
 
-    socket.on('save', async (data) => {
-      const score = new scoreModel(data);
-      console.log(score);
+    socket.on('save', async (data: SaveData) => {
+      console.log('save', data);
+      //todo data validation
+      const room = getRoom(socket);
+      const { evaluation, clicks, clicker, videoId } = data;
+
+      const score = new scoreModel({
+        room,
+        evaluation,
+        clicks,
+        clicker,
+        videoId,
+      });
       await score.save();
       socket.emit('saved');
       socket.broadcast.to(getRoom(socket)).emit('syncClick', {

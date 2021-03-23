@@ -11,7 +11,7 @@ export interface Score extends Document {
   clicker: User['_id'];
   clicks: Number;
   room: Room['_id'];
-  evaluation: Array<string>;
+  evaluation: { [key: string]: number };
 }
 
 const scoreSchema = new Schema({
@@ -19,7 +19,7 @@ const scoreSchema = new Schema({
   clicker: { type: Schema.Types.ObjectId, ref: UserModel },
   clicks: Number,
   room: { type: Schema.Types.ObjectId, ref: RoomModel },
-  evaluation: Array,
+  evaluation: Object,
 });
 
 export default mongoose.model<Score>('Score', scoreSchema);
