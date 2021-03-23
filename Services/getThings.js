@@ -2,38 +2,54 @@ const mongoose = require('mongoose');
 
 //mongoose setup
 mongoose.Promise = global.Promise;
-require('../Models/Score');
-require('../Models/User');
-require('../Models/ClickHistory');
-
-const userModel = mongoose.model('User');
+require('./ScoreModel');
+require('./UserModel');
 const scoreModel = mongoose.model('Score');
-const clickHistoryModel = mongoose.model('ClickHistory');
 
-mongoose.connect(process.env.MONGOURL, { useNewUrlParser: true }, (error) =>
-  error ? console.error('Db:', error) : console.log('Db Connected')
+//todo put mongouri
+const mongoURL =
+  '';
+
+mongoose.connect(
+  process.env.MONGOURL || mongoURL,
+  { useNewUrlParser: true },
+  (error) => (error ? console.error('Db:', error) : console.log('Db Connected'))
 );
 
 const getScore = async () => {
   const mapa = {
-    Tb1vTLkv15Y: 'BETTY GALLEGOS',
-    nVlwNQ4mYJA: 'SEBASTIAN LAVIN',
-    DvpFzR7toHk: 'EMILIANO RIVERO',
-    'i-Hl5a34jGw': 'MARTIN MUÑOZ',
-    'rH2qIo-y13U': 'ANIBAL ROJAS',
-    '2yiHIeBo52s': 'IGNACIO FERNANDEZ',
-    RWWwp119GN8: 'MATIAS JENSEN',
-    '5AxKnpcm6H8': 'KEVIN GONZALEZ',
-    '2UsrHfSdczE': 'JOSUE VILLAMAR',
-    cGAS_5LQgL4: 'DANIEL BORGES',
-    'MnMy9-UCTWE': 'GUILHERME FRAGOSO',
-    WOheLIxhjqI: 'PATRCIK RONCOSKI',
-    UdydTULJ_YQ: 'HIDEKI YASSUDA',
-    wtGxXekSbsc: 'RAFAEL YURI',
-    xL8h8XtkpmI: 'ANDRE SHINDI FUCUHARA',
-    IjyIsHUTj1c: 'JONES ROGER',
-    'aDf-SPEY-xk': 'MATHIAS FERNANDEZ',
-    GuBD1SfcxNI: 'FARID BERMUDEZ',
+    'alaMBvlXL-k': 'OPEN Heitor Peres Cavalcante',
+    '9DzCr6iF0CM': 'OPEN André Shindi Fucuhara',
+    sQ_O8seWMBs: 'OPEN Robyen Juan',
+    'Frit-29475A': 'OPEN Eduardo Monma',
+    '8Gps64NA4qg': 'OPEN Guilherme Fragoso',
+    wlrcRu5gtN4: 'AMADOR Gabriel Martins Machado',
+    yTtBlz7pTjo: 'AMADOR Erolaine de oliveira mateus',
+    Xqwepj9G0_0: 'AMADOR Artur Bernardes Damo',
+    jmtTOKe1a8s: 'AMADOR Gustavo Henrique dos Santos',
+    '9Mqpqmmbj-w': 'AMADOR Ricardo Massayuki Ishii',
+    _fjSjg8ZPwk: 'AMADOR Cadu Caetano',
+    tHsr1Or1Lk8: 'AMADOR Theo Puglia Ferraz de Camargo',
+    g9QuSkH5W30: 'AMADOR Farley Saimon Silva Borba',
+    WwPeL_OtMbw: 'AMADOR Dante Völker',
+    jJjXmJIjFEg: 'AMADOR João Couto Oliveira Rosa',
+    sAC1ayI0hdc: 'AMADOR Daniela Stain Gatti',
+    gUpuLslMVDo: 'AMADOR Rodrigo de Sousa',
+    W_UiCjNWYNs: 'AMADOR Guilherme Ruthes',
+    jhFwmgnw85A: 'AMADOR Alex de Azevedo Bueno',
+    ai_f1DgTYTg: 'PRO Heitor Peres Cavalcante',
+    gSWFvZmj5Pc: 'PRO André Shindi Fucuhara',
+    WntMulV3QXE: 'PRO Robyen Juan',
+    bTRK1laYLqU: 'PRO Eduardo Monma',
+    mzKTndAI4J8: 'PRO Guilherme Fragoso',
+    'IIag-h41mvA': 'PRO Bernardo Moratori Peixoto',
+    BGRp_WZSdo4: 'PRO Danyllo Robert Barbiero',
+    yG0DbH210RM: 'PRO Thiago Lima de Azevedo',
+    sSYkBee9LUA: 'PRO Hideki Yassuda',
+    FGtnuC9o04k: 'PRO ThiagoSMB',
+    '4sOlRjm8vRs': 'PRO João Henrique de Sant’Ana',
+    ZNf9vQc6QUM: 'PRO Rafael Yuri',
+    Fpdvb4XL8Vk: 'PRO Jones Roger',
   };
 
   const json = await scoreModel
@@ -41,29 +57,10 @@ const getScore = async () => {
       videoId: { $in: Object.keys(mapa) },
     })
     .populate('clicker');
-  console.log(json, 'aaaa');
-  // const mapa = {
-  //   WtDjDxdytNU: '1A Felipe',
-  //   Go7n2Dk_4Y: '1A Patrick Ronckoski',
-  //   IM2dazr1VCU: '1A Guxtavo amaral',
-  //   wtNjHnLyZrU: '1A Maicon cunha',
-  //   VtYLSmqZTsM: '1A Thiago deus smb',
-  //   K0iEBB0pbys: '1A Marechal',
-  //   '5nv9WT-ZRIk': '1A Heitor Peres',
-  //   zpmcS2EUdDg: '1A Guilherme Fragoso',
-  //   Lbo1Onk7qK: '1A Rafael Yuri',
-  //   gXmpIVvXLHc: '1A Daniel Borges',
-  //   '3-Z7uIObFbk': '1A Eduardo Moma',
-  //   vznSHrBZ7uc: '1A Shindi',
-  //   Cqlw4YwV740: 'OPEN Guxtavo amaral',
-  //   NOdeZW1FUCY: 'OPEN Heitor Peres',
-  //   QyvuryAWMrE: 'OPEN Eduardo Moma',
-  //   aRMucpcKL0w: 'OPEN Daniel Borges',
-  //   '-0NFHRZmteo': 'OPEN Guilherme Fragoso',
-  //   KfnhYg1pXuE: 'OPEN Patrick Ronckoski',
-  // };
 
-  const processed = json.map((object) => {
+  const jsonP1 = json.filter((object) => object.coreografia);
+
+  const processed = jsonP1.map((object) => {
     if (object) {
       const {
         clicks,
@@ -77,12 +74,12 @@ const getScore = async () => {
       videoPlayer = mapa[videoId];
       return {
         clicks,
-        coreografia,
-        diversidade,
         controle,
-        execucao,
+        risco: execucao,
+        diversidade,
+        coreografia,
         clicker: clicker.name,
-        videoPlayer,
+        video: videoPlayer,
       };
     }
   });
