@@ -126,6 +126,18 @@ const Room: React.FC<RoomProps> = (props) => {
     setIsBlocked(true);
   };
 
+  //function that executes after player is ready
+  const onPlayerReady = () => {
+    //Socket configuration and subscription
+    socketManager.setPlayerControl(playerControl);
+    socketManager.subscribeSocketListeners();
+
+    //joining room after pre setup is ready
+    const roomId = props.match.params.roomId;
+    socket.emit('joinRoom', { roomId });
+    session.socket.emit('getClickerList');
+  };
+
   //Video Events
   const videoEvents = {
     onReady: (event) => {
@@ -133,11 +145,7 @@ const Room: React.FC<RoomProps> = (props) => {
       playerControl.playVideo();
       playerControl.pauseVideo();
       //this.timeManager.restart();
-
-      //Socket configuration and subscription
-      socketManager.setPlayerControl(playerControl);
-      socketManager.subscribeSocketListeners();
-      session.socket.emit('getClickerList');
+      onPlayerReady();
     },
     onStateChange: (event) => {
       switch (event.data) {
@@ -207,11 +215,6 @@ const Room: React.FC<RoomProps> = (props) => {
     socketManager.setTimerDisplay(timerDisplay);
     socketManager.setResetVariables(resetVariables);
   }, []);
-
-  useEffect(() => {
-    const roomId = props.match.params.roomId;
-    socket.emit('joinRoom', { roomId });
-  });
 
   return (
     <>
