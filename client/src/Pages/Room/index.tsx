@@ -11,12 +11,23 @@ import Footer from '../../Components/Footer';
 import JudgesList, { Clickers } from './Components/JudgesList';
 import AdminPanel from './Components/AdminPanel';
 import Control from './Components/Control';
-import AvaliationPanel from './Components/AvaliationPanel';
+import AvaliationPanel, { EvalRules } from './Components/AvaliationPanel';
 import Player, { VideoEvents, PlayerControl } from './Components/Player';
 
 interface MatchParams {
   roomId: string;
 }
+
+interface RoomData {
+  name: string;
+  desc: string;
+  admins: Array<string>;
+  judges: Array<string>;
+  guests: Array<string>;
+  owner: string;
+  evalScheme: EvalRules;
+}
+
 interface RoomProps extends RouteComponentProps<MatchParams> {}
 
 const Room: React.FC<RoomProps> = (props) => {
@@ -26,19 +37,6 @@ const Room: React.FC<RoomProps> = (props) => {
 
   const { socket } = session;
   //const clickHistory = [];
-
-  //todo remove later
-  const evalRules = {
-    total: 100,
-    keys: ['ORI', 'CON', 'VAR', 'MUS'],
-    values: {
-      ORI: { weight: 10, type: '0-10', title: 'ORIGINALIDADE/RISCO(10)' },
-      CON: { weight: 10, type: '0-10', title: 'CONTROLE(10)' },
-      VAR: { weight: 10, type: '0-10', title: 'VARIAÇÃO/USO DE ESPAÇO(10)' },
-      MUS: { weight: 10, type: '0-10', title: 'MUSICA/PERFORMANCE(10)' },
-    },
-    click: { weight: 60, type: 'click', title: 'Tecnical(click)' },
-  };
 
   //*States
   const [clickers, setClickers] = useState<Clickers>({ list: [], objects: {} });
@@ -58,6 +56,12 @@ const Room: React.FC<RoomProps> = (props) => {
   const [positive, setPositive] = useState(0);
   const [negative, setNegative] = useState(0);
   const [score, setScore] = useState(0);
+
+  //state for avaliation
+  const [evalRules, setEvalRules] = useState<EvalRules>({
+    keys: [],
+    values: {},
+  });
 
   //*Functions
   const click = (isPositive: boolean) => {
@@ -207,6 +211,8 @@ const Room: React.FC<RoomProps> = (props) => {
     //update clickersDispather on socket manager
     socketManager.setClickersDispatcher(setClickers);
     socketManager.setIsAdminDispatcher(setIsAdmin);
+    socketManager.setEvalRulesDispatcher(setEvalRules);
+
     socketManager.setFlash(flash);
     socketManager.setSession(session);
     socketManager.setTimerDisplay(timerDisplay);

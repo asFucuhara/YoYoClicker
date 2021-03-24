@@ -167,7 +167,7 @@ module.exports = (server: Server) => {
       if (room) {
         socket.leaveAll();
         socket.join(data.roomId);
-        socket.emit('joinedRoom', { ...room, isAdmin });
+        socket.emit('joinedRoom', { room, isAdmin });
       } else {
         socket.emit('joinRoomError', { message: 'cannot find room' });
       }

@@ -1,6 +1,7 @@
 import { Clickers, ClickersObject, Judge } from './Components/JudgesList';
 import { PlayerControl } from './Components/Player';
 import { session } from '../../utils/socket';
+import { EvalRules } from './Components/AvaliationPanel';
 
 interface ClickedData {
   id: string;
@@ -17,12 +18,16 @@ interface SyncClickData {
 
 interface JoinedRoomData {
   isAdmin: boolean;
+  room: {
+    evalRules: EvalRules;
+  };
 }
 
 interface SocketManager {
   session: typeof session;
   playerControl: PlayerControl;
   clickers: Clickers;
+  evalRulesDispatcher: React.Dispatch<React.SetStateAction<EvalRules>>;
   clickersDispatcher: React.Dispatch<React.SetStateAction<Clickers>>;
   isAdminDispatcher: React.Dispatch<React.SetStateAction<boolean>>;
   flash: (elementId: string, cssClass: string) => void;
@@ -41,6 +46,9 @@ interface SocketManager {
   setIsAdminDispatcher: (
     clickersDispatcher: typeof socketManager['isAdminDispatcher']
   ) => void;
+  setEvalRulesDispatcher: (
+    evalRulesDispatcher: typeof socketManager['evalRulesDispatcher']
+  ) => void;
   setSession: (session: typeof socketManager['session']) => void;
   setPlayerControl: (player: typeof socketManager['playerControl']) => void;
   setFlash: (flashFunction: typeof socketManager['flash']) => void;
@@ -57,6 +65,7 @@ const socketManager = {
   clickers: {},
   clickersDispatcher: {},
   isAdminDispatcher: {},
+  evalRulesDispatcher: {},
   flash: {},
   timerDisplay: {},
   resetVariables: {},
@@ -78,7 +87,9 @@ const socketManager = {
   setIsAdminDispatcher: (isAdminDispatcher) => {
     socketManager.isAdminDispatcher = isAdminDispatcher;
   },
-
+  setEvalRulesDispatcher: (evalRulesDispatcher) => {
+    socketManager.evalRulesDispatcher = evalRulesDispatcher;
+  },
   setTimerDisplay: (timerDisplay) => {
     socketManager.timerDisplay = timerDisplay;
   },
@@ -232,8 +243,13 @@ const socketManager = {
           console.log('WIP messsage received, force restart');
         },
         joinedRoom: (data: JoinedRoomData) => {
-          const { isAdmin } = data;
+          const {
+            isAdmin,
+            room: { evalRules },
+          } = data;
+
           socketManager.isAdminDispatcher(isAdmin);
+          socketManager.evalRulesDispatcher(evalRules);
         },
       };
       (Object.keys(socketFunctions) as Array<

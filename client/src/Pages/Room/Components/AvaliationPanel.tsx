@@ -13,12 +13,12 @@ interface MessageConfig {
 }
 
 export interface EvalRules {
-  total: number;
+  total?: number;
   keys: Array<keyof EvalRules['values']>;
   values: {
-    [key: string]: { weight: number; type: string; title: string };
+    [key: string]: { weight?: number; type?: string; title: string };
   };
-  click: { weight: number; type: string; title: string };
+  click?: { weight?: number; type?: string; title: string };
 }
 
 const AvaliationPanel = (props: AvaliationPanelProps) => {
