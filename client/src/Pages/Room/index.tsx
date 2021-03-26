@@ -36,6 +36,13 @@ const Room: React.FC<RoomProps> = (props) => {
   }
 
   const { socket } = session;
+  const adminFunctions = {
+    videoChange: (data: { videoId: string }) =>
+      socket.emit('videoChange', data),
+    videoStart: () => socket.emit('videoStart'),
+    videoPause: () => socket.emit('videoPause'),
+    videoRestart: () => socket.emit('videoRestart'),
+  };
   //const clickHistory = [];
 
   //*States
@@ -212,7 +219,6 @@ const Room: React.FC<RoomProps> = (props) => {
     socketManager.setClickersDispatcher(setClickers);
     socketManager.setIsAdminDispatcher(setIsAdmin);
     socketManager.setEvalRulesDispatcher(setEvalRules);
-
     socketManager.setFlash(flash);
     socketManager.setSession(session);
     socketManager.setTimerDisplay(timerDisplay);
@@ -235,7 +241,7 @@ const Room: React.FC<RoomProps> = (props) => {
           setPlayerRef={setPlayerControl}
         />
         {isAdmin ? (
-          <AdminPanel socket={socket} />
+          <AdminPanel adminFunctions={adminFunctions} />
         ) : showAvaliation ? (
           <AvaliationPanel
             save={saveEval}
