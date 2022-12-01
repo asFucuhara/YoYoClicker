@@ -12,7 +12,7 @@ export const session = {
 
 export const socketAuthenticate = (params = {}) => {
   //connect socket
-  const socket = socketIOClient('localhost:5000');
+  const socket = socketIOClient('localhost:4000');
 
   return new Promise((resolve, reject) => {
     socket.on('connect', () => {
