@@ -1,5 +1,10 @@
 # YoYoClicker
 
+Config for dev
+create file ./config/dev.ts(copy of example)
+change mongoURL as desired
+
+
 install node
 
 use node version 11.xx
