@@ -27,8 +27,10 @@ https://github.com/coreybutler/nvm-windows
 
 ## Cliend e Backend Server on development mode
 > Start local service
+Open 2 terminals
 1. Client(goto ./client folder)
 ```
+cd ./client
 npm install
 npm start
 ````
