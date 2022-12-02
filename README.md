@@ -1,14 +1,21 @@
 # YoYoClicker
 
-use node version 1.xx
+install node
 
-for *nix based SO install versinon using n: 
+use node version 11.xx
+check with
+node --version
+
+node version manager
+for *nix based SO install version using n: 
 npm install -g n
 sudo n install 11
 
 for windows
-???
+https://github.com/coreybutler/nvm-windows
 
+
+start local service
 client(goto client folder)
 npm install
 npm start
@@ -17,6 +24,8 @@ server(root folder) for development
 npm run dev
 
 
-For build *i_guess
-npm install
-npm run build
+##usage
+login with adminstrator
+to acess administrator feature
+
+login with judge to judge
