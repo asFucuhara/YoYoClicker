@@ -1,36 +1,45 @@
 # YoYoClicker
 
-Config for dev
+
+##Config for dev
 create file ./config/dev.ts(copy of example)
 change mongoURL as desired
 
+##Setup
+1. Install node
 
-install node
-
-use node version 11.xx
+2. Use node version 11.xx
 check with
+```
 node --version
+```
 
-node version manager
-for *nix based SO install version using n: 
+3. node version manager
+- for *nix based SO install version using n: 
+```
 npm install -g n
 sudo n install 11
+````
 
-for windows
+- for windows
 https://github.com/coreybutler/nvm-windows
 
 
-start local service
-client(goto client folder)
+## Cliend e Backend Server on development mode
+> Start local service
+1. Client(goto ./client folder)
+```
 npm install
 npm start
+````
 
-server(root folder) for development
+
+2. server(root folder)
+```
 npm run dev
-
+```
 
 ##usage
-login with adminstrator
-to acess administrator feature
 
+login with adminstrator to acess administrator feature
 login with judge to judge
